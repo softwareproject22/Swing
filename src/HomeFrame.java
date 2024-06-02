@@ -56,7 +56,7 @@ public class HomeFrame extends JFrame {
             dispose();
         });
         statsButton.addActionListener(e -> {
-            // new StatsFrame(loginId).setVisible(true);
+            new StatsFrame(loginId).setVisible(true);
             dispose();
         });
         adminButton.addActionListener(e -> {
