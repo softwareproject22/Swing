@@ -28,50 +28,52 @@ public class HomeFrame extends JFrame {
         // Header Panel
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BorderLayout());
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        headerPanel.setBackground(Color.WHITE);
 
         JLabel titleLabel = new JLabel("Issue Management System", SwingConstants.LEFT);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(234, 185, 151));
 
         JPanel navPanel = new JPanel();
         navPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(Color.WHITE);
 
-        JButton homeButton = new JButton("Home");
-        JButton logoutButton = new JButton("Logout");
-        JButton viewButton = new JButton("View");
-        JButton issueButton = new JButton("Issue");
-        JButton statsButton = new JButton("Stats");
-        JButton adminButton = new JButton("Admin");
+        String[] buttonLabels = {"Home", "Logout", "View", "Issue", "Stats", "Admin"};
+        JButton[] buttons = new JButton[buttonLabels.length];
 
-        homeButton.addActionListener(e -> {
+        for (int i = 0; i < buttonLabels.length; i++) {
+            buttons[i] = new JButton(buttonLabels[i]);
+            buttons[i].setForeground(buttonLabels[i].equals("Home") ? new Color(234, 185, 151) : Color.BLACK);
+            buttons[i].setFont(new Font("SansSerif", Font.PLAIN, 14));
+            buttons[i].setBorderPainted(false);
+            buttons[i].setContentAreaFilled(false);
+            navPanel.add(buttons[i]);
+        }
+
+        buttons[0].addActionListener(e -> {
             new HomeFrame(loginId).setVisible(true);
             dispose();
         });
-        logoutButton.addActionListener(e -> logout());
-        viewButton.addActionListener(e -> {
+        buttons[1].addActionListener(e -> logout());
+        buttons[2].addActionListener(e -> {
             new ViewFrame(loginId).setVisible(true);
             dispose();
         });
-        issueButton.addActionListener(e -> {
+        buttons[3].addActionListener(e -> {
             new IssueFrame(loginId).setVisible(true);
             dispose();
         });
-        statsButton.addActionListener(e -> {
+        buttons[4].addActionListener(e -> {
             new StatsFrame(loginId).setVisible(true);
             dispose();
         });
-        adminButton.addActionListener(e -> {
+        buttons[5].addActionListener(e -> {
             if ("admin".equals(loginId)) {
                 new AdminFrame(loginId).setVisible(true);
                 dispose();
             }
         });
-
-        navPanel.add(homeButton);
-        navPanel.add(viewButton);
-        navPanel.add(issueButton);
-        navPanel.add(statsButton);
-        navPanel.add(adminButton);
-        navPanel.add(logoutButton);
 
         headerPanel.add(titleLabel, BorderLayout.WEST);
         headerPanel.add(navPanel, BorderLayout.EAST);
@@ -80,10 +82,20 @@ public class HomeFrame extends JFrame {
 
         // Main content Panel
         JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new GridLayout(2, 1));
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        contentPanel.setBackground(Color.WHITE);
+
         nicknameLabel = new JLabel("", SwingConstants.CENTER);
+        nicknameLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        nicknameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         messageLabel = new JLabel("", SwingConstants.CENTER);
+        messageLabel.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         contentPanel.add(nicknameLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
         contentPanel.add(messageLabel);
 
         panel.add(contentPanel, BorderLayout.CENTER);

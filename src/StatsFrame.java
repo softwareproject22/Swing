@@ -26,13 +26,42 @@ public class StatsFrame extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 2));
+        panel.setLayout(new BorderLayout());
 
-        // Fetch and display statistics
-        displayDailyStats(panel);
-        displayMonthlyStats(panel);
-        displayStatusStats(panel);
-        displayTagsStats(panel);
+        // Add header panel with Home button
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BorderLayout());
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        headerPanel.setBackground(Color.WHITE);
+
+        JLabel titleLabel = new JLabel("Issue Statistics", SwingConstants.LEFT);
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(234, 185, 151));
+
+        JButton homeButton = new JButton("Home");
+        homeButton.setForeground(new Color(234, 185, 151));
+        homeButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        homeButton.setBorderPainted(false);
+        homeButton.setContentAreaFilled(false);
+        homeButton.addActionListener(e -> {
+            new HomeFrame(loginId).setVisible(true);
+            dispose();
+        });
+
+        headerPanel.add(titleLabel, BorderLayout.WEST);
+        headerPanel.add(homeButton, BorderLayout.EAST);
+
+        panel.add(headerPanel, BorderLayout.NORTH);
+
+        // Main content panel
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new GridLayout(2, 2));
+        displayDailyStats(contentPanel);
+        displayMonthlyStats(contentPanel);
+        displayStatusStats(contentPanel);
+        displayTagsStats(contentPanel);
+
+        panel.add(contentPanel, BorderLayout.CENTER);
 
         add(panel);
     }

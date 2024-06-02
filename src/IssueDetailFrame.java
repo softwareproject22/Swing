@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.InputStream;
@@ -52,14 +51,18 @@ public class IssueDetailFrame extends JFrame {
 
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(Color.WHITE);
+
         JLabel titleLabel = new JLabel("Issue Management System", SwingConstants.LEFT);
-        titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setFont(new Font("돋움", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(255, 87, 34));
 
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(Color.WHITE);
+
         String[] buttons = {"Home", "Logout", "View", "Issue", "Stats"};
         for (String btnText : buttons) {
-            JButton button = new JButton(btnText);
-            button.addActionListener(e -> handleNavButtonClick(btnText));
+            JButton button = createNavButton(btnText);
             navPanel.add(button);
         }
 
@@ -69,56 +72,123 @@ public class IssueDetailFrame extends JFrame {
         return headerPanel;
     }
 
+    private JButton createNavButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("돋움", Font.PLAIN, 14));
+        button.setForeground(new Color(102, 102, 102));
+        button.setBackground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setOpaque(false);
+        button.addActionListener(e -> handleNavButtonClick(text));
+        return button;
+    }
+
     private JPanel createContentPanel() {
-        JPanel contentPanel = new JPanel(new GridLayout(10, 2));
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setBackground(Color.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
 
         issueIdLabel = new JLabel("#" + issueId);
+        issueIdLabel.setFont(new Font("돋움", Font.BOLD, 18));
+        issueIdLabel.setForeground(new Color(255, 87, 34));
         statusValueLabel = new JLabel();
+        statusValueLabel.setFont(new Font("돋움", Font.PLAIN, 16));
         titleValueLabel = new JLabel();
+        titleValueLabel.setFont(new Font("돋움", Font.BOLD, 18));
         reporterValueLabel = new JLabel();
-        assigneeField = new JTextField();
+        assigneeField = new JTextField(15);
         assigneeField.setEditable(false);
         assigneeComboBox = new JComboBox<>();
         priorityValueLabel = new JLabel();
         tagValueLabel = new JLabel();
         fixerValueLabel = new JLabel();
-        descriptionArea = new JTextArea();
+        descriptionArea = new JTextArea(5, 20);
         descriptionArea.setEditable(false);
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setWrapStyleWord(true);
 
-        commentArea = new JTextArea();
+        commentArea = new JTextArea(3, 20);
+        commentArea.setLineWrap(true);
+        commentArea.setWrapStyleWord(true);
         statusLabel = new JLabel("");
 
-        addLabelAndComponent(contentPanel, "Issue ID:", issueIdLabel);
-        addLabelAndComponent(contentPanel, "Status:", statusValueLabel);
-        addLabelAndComponent(contentPanel, "Title:", titleValueLabel);
-        addLabelAndComponent(contentPanel, "Reporter:", reporterValueLabel);
-        addLabelAndComponent(contentPanel, "Assignee:", assigneeField);
-        addLabelAndComponent(contentPanel, "Change Assignee:", assigneeComboBox);
-        addLabelAndComponent(contentPanel, "Priority:", priorityValueLabel);
-        addLabelAndComponent(contentPanel, "Tag:", tagValueLabel);
-        addLabelAndComponent(contentPanel, "Fixer:", fixerValueLabel);
-        addLabelAndComponent(contentPanel, "Description:", new JScrollPane(descriptionArea));
-        addLabelAndComponent(contentPanel, "Comment:", new JScrollPane(commentArea));
+        // First Row
+        addLabelAndComponent(contentPanel, "Issue ID:", issueIdLabel, gbc, 0, 0);
+        addLabelAndComponent(contentPanel, "Status:", statusValueLabel, gbc, 2, 0);
+        addLabelAndComponent(contentPanel, "Title:", titleValueLabel, gbc, 0, 1, 4);
 
-        addButton(contentPanel, "Add Comment", e -> addComment());
-        addButton(contentPanel, "Change Status", e -> changeIssueStatus());
-        addButton(contentPanel, "Change Assignee", e -> changeAssignee());
-        addButton(contentPanel, "코드수정", e -> fixCode());
+        // Second Row
+        addLabelAndComponent(contentPanel, "Reporter:", reporterValueLabel, gbc, 0, 2);
+        addLabelAndComponent(contentPanel, "Assignee:", assigneeField, gbc, 2, 2);
 
-        contentPanel.add(statusLabel);
+        // Third Row
+        addLabelAndComponent(contentPanel, "Change Assignee:", assigneeComboBox, gbc, 0, 3, 4);
+
+        // Fourth Row
+        addLabelAndComponent(contentPanel, "Priority:", priorityValueLabel, gbc, 0, 4);
+        addLabelAndComponent(contentPanel, "Tag:", tagValueLabel, gbc, 2, 4);
+
+        // Fifth Row
+        addLabelAndComponent(contentPanel, "Fixer:", fixerValueLabel, gbc, 0, 5, 4);
+
+        // Sixth Row
+        addLabelAndComponent(contentPanel, "Description:", new JScrollPane(descriptionArea), gbc, 0, 6, 4);
+
+        // Seventh Row
+        addLabelAndComponent(contentPanel, "Comment:", new JScrollPane(commentArea), gbc, 0, 7, 4);
+
+        // Button Row
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.add(createActionButton("Add Comment", e -> addComment()));
+        buttonPanel.add(createActionButton("Change Status", e -> changeIssueStatus()));
+        buttonPanel.add(createActionButton("Change Assignee", e -> changeAssignee()));
+        buttonPanel.add(createActionButton("Fix Code", e -> fixCode()));
+
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.gridwidth = 4;
+        gbc.anchor = GridBagConstraints.CENTER;
+        contentPanel.add(buttonPanel, gbc);
+
+        gbc.gridy = 9;
+        contentPanel.add(statusLabel, gbc);
 
         return contentPanel;
     }
 
-    private void addLabelAndComponent(JPanel panel, String labelText, JComponent component) {
-        panel.add(new JLabel(labelText));
-        panel.add(component);
+    private JButton createActionButton(String text, ActionListener actionListener) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("돋움", Font.PLAIN, 14));
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(255, 87, 34));
+        button.setFocusPainted(false);
+        button.addActionListener(actionListener);
+        return button;
     }
 
-    private void addButton(JPanel panel, String buttonText, ActionListener actionListener) {
-        JButton button = new JButton(buttonText);
-        button.addActionListener(actionListener);
-        panel.add(button);
+    private void addLabelAndComponent(JPanel panel, String labelText, JComponent component, GridBagConstraints gbc, int x, int y) {
+        addLabelAndComponent(panel, labelText, component, gbc, x, y, 1);
+    }
+
+    private void addLabelAndComponent(JPanel panel, String labelText, JComponent component, GridBagConstraints gbc, int x, int y, int width) {
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel label = new JLabel(labelText);
+        label.setFont(new Font("돋움", Font.PLAIN, 14));
+        panel.add(label, gbc);
+
+        gbc.gridx = x + 1;
+        gbc.gridy = y;
+        gbc.gridwidth = width;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(component, gbc);
     }
 
     private void handleNavButtonClick(String buttonText) {
@@ -137,8 +207,8 @@ public class IssueDetailFrame extends JFrame {
                 targetFrame = new IssueFrame(loginId);
                 break;
             case "Stats":
-                // Implement StatsFrame if needed
-                return;
+                targetFrame = new StatsFrame(loginId);
+                break;
             default:
                 return;
         }

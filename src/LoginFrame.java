@@ -16,25 +16,65 @@ public class LoginFrame extends JFrame {
 
     public LoginFrame() {
         setTitle("Login Page");
-        setSize(300, 200);
+        setSize(400, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 1));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.WHITE);
 
-        loginIdField = new JTextField();
-        passwordField = new JPasswordField();
-        statusLabel = new JLabel("");
+        // Title
+        JLabel titleLabel = new JLabel("Issue Management System", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setForeground(new Color(234, 185, 151));
 
-        JButton loginButton = new JButton("Login");
+        // Login ID field
+        loginIdField = new JTextField("ID");
+        loginIdField.setPreferredSize(new Dimension(200, 40));
+        loginIdField.setMaximumSize(new Dimension(200, 40));
+        loginIdField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loginIdField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        loginIdField.setBorder(BorderFactory.createLineBorder(new Color(234, 185, 151), 2));
+        loginIdField.setForeground(Color.GRAY);
+
+        // Password field
+        passwordField = new JPasswordField("PW");
+        passwordField.setPreferredSize(new Dimension(200, 40));
+        passwordField.setMaximumSize(new Dimension(200, 40));
+        passwordField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        passwordField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        passwordField.setBorder(BorderFactory.createLineBorder(new Color(234, 185, 151), 2));
+        passwordField.setForeground(Color.GRAY);
+
+        // Login Button
+        JButton loginButton = new JButton("Log in");
+        loginButton.setPreferredSize(new Dimension(200, 40));
+        loginButton.setMaximumSize(new Dimension(200, 40));
+        loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loginButton.setBackground(new Color(234, 185, 151));
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        loginButton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        loginButton.setFocusPainted(false);
         loginButton.addActionListener(new LoginButtonListener());
 
-        panel.add(new JLabel("Login ID:"));
+        // Status Label
+        statusLabel = new JLabel("", SwingConstants.CENTER);
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        statusLabel.setForeground(Color.RED);
+
+        // Adding components to panel
+        panel.add(Box.createVerticalStrut(50)); // Spacer
+        panel.add(titleLabel);
+        panel.add(Box.createVerticalStrut(50)); // Spacer
         panel.add(loginIdField);
-        panel.add(new JLabel("Password:"));
+        panel.add(Box.createVerticalStrut(10)); // Spacer
         panel.add(passwordField);
+        panel.add(Box.createVerticalStrut(10)); // Spacer
         panel.add(loginButton);
+        panel.add(Box.createVerticalStrut(20)); // Spacer
         panel.add(statusLabel);
 
         add(panel);
@@ -53,6 +93,7 @@ public class LoginFrame extends JFrame {
 
                 if (jsonResponse.has("message")) {
                     statusLabel.setText("Login successful");
+                    statusLabel.setForeground(new Color(0, 128, 0)); // Green for success
                     // 로그인 성공 시 홈 프레임을 생성하고 보이기
                     HomeFrame homeFrame = new HomeFrame(loginId);
                     homeFrame.setVisible(true);

@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -26,9 +24,6 @@ public class IssueFrame extends JFrame {
         this.loginId = loginId;
         this.tagIds = new ArrayList<>();
 
-        // 로그인 ID 출력
-        System.out.println("Login ID: " + this.loginId);
-
         setTitle("Issue Management System");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -36,46 +31,32 @@ public class IssueFrame extends JFrame {
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
+        panel.setBackground(Color.WHITE);
 
         // Header Panel
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BorderLayout());
+        headerPanel.setBackground(Color.WHITE);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JLabel titleLabel = new JLabel("Issue Management System", SwingConstants.LEFT);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(234, 185, 151));
 
         JPanel navPanel = new JPanel();
         navPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(Color.WHITE);
 
-        JButton homeButton = new JButton("Home");
-        JButton logoutButton = new JButton("Logout");
-        JButton viewButton = new JButton("View");
-        JButton issueButton = new JButton("Issue");
-        JButton statsButton = new JButton("Stats");
-
-        homeButton.addActionListener(e -> {
-            new HomeFrame(loginId).setVisible(true);
-            dispose();
-        });
-        logoutButton.addActionListener(e -> logout());
-        viewButton.addActionListener(e -> {
-            new ViewFrame(loginId).setVisible(true);
-            dispose();
-        });
-        issueButton.addActionListener(e -> {
-            new IssueFrame(loginId).setVisible(true);
-            dispose();
-        });
-        statsButton.addActionListener(e -> {
-            //new StatsFrame(loginId).setVisible(true);
-            dispose();
-        });
-
-        navPanel.add(homeButton);
-        navPanel.add(viewButton);
-        navPanel.add(issueButton);
-        navPanel.add(statsButton);
-        navPanel.add(logoutButton);
+        String[] buttons = {"Home", "View", "Issue", "Stats", "Logout"};
+        for (String btnText : buttons) {
+            JButton button = new JButton(btnText);
+            button.setForeground(new Color(234, 185, 151));
+            button.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            button.setBorderPainted(false);
+            button.setContentAreaFilled(false);
+            button.addActionListener(e -> handleNavButtonClick(btnText));
+            navPanel.add(button);
+        }
 
         headerPanel.add(titleLabel, BorderLayout.WEST);
         headerPanel.add(navPanel, BorderLayout.EAST);
@@ -84,35 +65,83 @@ public class IssueFrame extends JFrame {
 
         // Main content Panel
         JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new GridLayout(7, 2));
+        contentPanel.setLayout(new GridBagLayout());
+        contentPanel.setBackground(Color.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 10, 10, 10);
 
-        contentPanel.add(new JLabel("Title:"));
-        titleField = new JTextField();
-        contentPanel.add(titleField);
+        JLabel formTitleLabel = new JLabel("Issue 등록하기", SwingConstants.CENTER);
+        formTitleLabel.setFont(new Font("Serif", Font.BOLD, 20));
+        formTitleLabel.setForeground(Color.BLACK);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        contentPanel.add(formTitleLabel, gbc);
 
-        contentPanel.add(new JLabel("Description:"));
-        descriptionArea = new JTextArea();
-        contentPanel.add(new JScrollPane(descriptionArea));
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        contentPanel.add(createLabel("Title:"), gbc);
 
-        contentPanel.add(new JLabel("Priority:"));
-        priorityComboBox = new JComboBox<>(new String[]{"Low", "Medium", "High"});
-        contentPanel.add(priorityComboBox);
+        gbc.gridx = 1;
+        titleField = createTextField();
+        contentPanel.add(titleField, gbc);
 
-        contentPanel.add(new JLabel("Reporter:"));
-        reporterField = new JTextField();
-        reporterField.setEditable(false);
-        contentPanel.add(reporterField);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        contentPanel.add(createLabel("Description:"), gbc);
 
-        contentPanel.add(new JLabel("Tag:"));
+        gbc.gridx = 1;
+        descriptionArea = createTextArea();
+        contentPanel.add(new JScrollPane(descriptionArea), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        contentPanel.add(createLabel("Tag:"), gbc);
+
+        gbc.gridx = 1;
         tagComboBox = new JComboBox<>();
-        contentPanel.add(tagComboBox);
+        contentPanel.add(tagComboBox, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        contentPanel.add(createLabel("Priority:"), gbc);
+
+        gbc.gridx = 1;
+        priorityComboBox = new JComboBox<>(new String[]{"Low", "Medium", "High"});
+        styleComboBox(priorityComboBox);
+        contentPanel.add(priorityComboBox, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        contentPanel.add(createLabel("Reporter:"), gbc);
+
+        gbc.gridx = 1;
+        reporterField = createTextField();
+        reporterField.setEditable(false);
+        contentPanel.add(reporterField, gbc);
 
         JButton registerButton = new JButton("등록");
+        registerButton.setBackground(new Color(234, 185, 151));
+        registerButton.setForeground(Color.WHITE);
+        registerButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        registerButton.setBorderPainted(false);
+        registerButton.setFocusPainted(false);
         registerButton.addActionListener(e -> registerIssue());
-        contentPanel.add(registerButton);
 
-        statusLabel = new JLabel("");
-        contentPanel.add(statusLabel);
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        gbc.gridwidth = 1;
+        contentPanel.add(registerButton, gbc);
+
+        statusLabel = new JLabel("", SwingConstants.CENTER);
+        statusLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        statusLabel.setForeground(Color.RED);
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 2;
+        contentPanel.add(statusLabel, gbc);
 
         panel.add(contentPanel, BorderLayout.CENTER);
 
@@ -120,6 +149,53 @@ public class IssueFrame extends JFrame {
 
         loadUserInfo();  // Load user info to get the nickname
         loadTags();      // Load tags from the server
+    }
+
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        return label;
+    }
+
+    private JTextField createTextField() {
+        JTextField textField = new JTextField();
+        textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        return textField;
+    }
+
+    private JTextArea createTextArea() {
+        JTextArea textArea = new JTextArea(5, 20);
+        textArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        return textArea;
+    }
+
+    private void styleComboBox(JComboBox<String> comboBox) {
+        comboBox.setFont(new Font("SansSerif", Font.PLAIN, 14));
+    }
+
+    private void handleNavButtonClick(String buttonText) {
+        JFrame targetFrame;
+        switch (buttonText) {
+            case "Home":
+                targetFrame = new HomeFrame(loginId);
+                break;
+            case "View":
+                targetFrame = new ViewFrame(loginId);
+                break;
+            case "Issue":
+                targetFrame = new IssueFrame(loginId);
+                break;
+            case "Stats":
+                targetFrame = new StatsFrame(loginId);
+                break;
+            case "Logout":
+                logout();
+                return;
+            default:
+                return;
+        }
+        targetFrame.setVisible(true);
+        dispose();
     }
 
     private void loadUserInfo() {
@@ -130,38 +206,20 @@ public class IssueFrame extends JFrame {
             connection.setRequestProperty("Accept", "application/json");
 
             int responseCode = connection.getResponseCode();
-            System.out.println("loadUserInfo Response Code: " + responseCode);
             if (responseCode == 200) {
-                InputStream responseStream = connection.getInputStream();
-                Scanner scanner = new Scanner(responseStream, StandardCharsets.UTF_8.name());
-                String responseBody = scanner.useDelimiter("\\A").next();
-                scanner.close();
-                System.out.println("loadUserInfo Response Body: " + responseBody);
-
+                String responseBody = getResponseString(connection);
                 JSONObject jsonResponse = new JSONObject(responseBody);
                 if (jsonResponse.has("nickname")) {
                     String nickname = jsonResponse.getString("nickname");
-
-                    // 닉네임 출력
-                    System.out.println("Nickname: " + nickname);
-
                     reporterField.setText(nickname);
                 } else {
                     statusLabel.setText("Failed to load user info");
                 }
             } else {
-                InputStream errorStream = connection.getErrorStream();
-                if (errorStream != null) {
-                    Scanner scanner = new Scanner(errorStream, StandardCharsets.UTF_8.name());
-                    String errorResponse = scanner.useDelimiter("\\A").next();
-                    scanner.close();
-                    System.out.println("loadUserInfo Error Response: " + errorResponse);
-                }
                 statusLabel.setText("Failed to load user info");
             }
         } catch (Exception ex) {
             statusLabel.setText("An error occurred: " + ex.getMessage());
-            System.out.println("Exception in loadUserInfo: " + ex.getMessage());
         }
     }
 
@@ -173,14 +231,8 @@ public class IssueFrame extends JFrame {
             connection.setRequestProperty("Accept", "application/json");
 
             int responseCode = connection.getResponseCode();
-            System.out.println("loadTags Response Code: " + responseCode);
             if (responseCode == 200) {
-                InputStream responseStream = connection.getInputStream();
-                Scanner scanner = new Scanner(responseStream, StandardCharsets.UTF_8.name());
-                String responseBody = scanner.useDelimiter("\\A").next();
-                scanner.close();
-                System.out.println("loadTags Response Body: " + responseBody);
-
+                String responseBody = getResponseString(connection);
                 JSONArray jsonResponse = new JSONArray(responseBody);
                 for (int i = 0; i < jsonResponse.length(); i++) {
                     JSONObject tag = jsonResponse.getJSONObject(i);
@@ -188,18 +240,10 @@ public class IssueFrame extends JFrame {
                     tagIds.add(tag.getInt("id"));
                 }
             } else {
-                InputStream errorStream = connection.getErrorStream();
-                if (errorStream != null) {
-                    Scanner scanner = new Scanner(errorStream, StandardCharsets.UTF_8.name());
-                    String errorResponse = scanner.useDelimiter("\\A").next();
-                    scanner.close();
-                    System.out.println("loadTags Error Response: " + errorResponse);
-                }
                 statusLabel.setText("Failed to load tags");
             }
         } catch (Exception ex) {
             statusLabel.setText("An error occurred: " + ex.getMessage());
-            System.out.println("Exception in loadTags: " + ex.getMessage());
         }
     }
 
@@ -229,32 +273,18 @@ public class IssueFrame extends JFrame {
             }
 
             int responseCode = connection.getResponseCode();
-            System.out.println("registerIssue Response Code: " + responseCode);
             if (responseCode == 201) {
-                InputStream responseStream = connection.getInputStream();
-                Scanner scanner = new Scanner(responseStream, StandardCharsets.UTF_8.name());
-                String responseBody = scanner.useDelimiter("\\A").next();
-                scanner.close();
-                System.out.println("registerIssue Response Body: " + responseBody);
-
+                String responseBody = getResponseString(connection);
                 if ("이슈가 생성되었습니다.".equals(responseBody)) {
                     statusLabel.setText("Issue created successfully");
                 } else {
                     statusLabel.setText("Failed to create issue");
                 }
             } else {
-                InputStream errorStream = connection.getErrorStream();
-                if (errorStream != null) {
-                    Scanner scanner = new Scanner(errorStream, StandardCharsets.UTF_8.name());
-                    String errorResponse = scanner.useDelimiter("\\A").next();
-                    scanner.close();
-                    System.out.println("registerIssue Error Response: " + errorResponse);
-                }
                 statusLabel.setText("Failed to create issue");
             }
         } catch (Exception ex) {
             statusLabel.setText("An error occurred: " + ex.getMessage());
-            System.out.println("Exception in registerIssue: " + ex.getMessage());
         }
     }
 
@@ -266,14 +296,8 @@ public class IssueFrame extends JFrame {
             connection.setRequestProperty("Accept", "application/json");
 
             int responseCode = connection.getResponseCode();
-            System.out.println("logout Response Code: " + responseCode);
             if (responseCode == 200) {
-                InputStream responseStream = connection.getInputStream();
-                Scanner scanner = new Scanner(responseStream, StandardCharsets.UTF_8.name());
-                String responseBody = scanner.useDelimiter("\\A").next();
-                scanner.close();
-                System.out.println("logout Response Body: " + responseBody);
-
+                String responseBody = getResponseString(connection);
                 JSONObject jsonResponse = new JSONObject(responseBody);
                 if (jsonResponse.has("message") && jsonResponse.getString("message").equals("Logout successful")) {
                     dispose();
@@ -282,18 +306,17 @@ public class IssueFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "Failed to log out.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                InputStream errorStream = connection.getErrorStream();
-                if (errorStream != null) {
-                    Scanner scanner = new Scanner(errorStream, StandardCharsets.UTF_8.name());
-                    String errorResponse = scanner.useDelimiter("\\A").next();
-                    scanner.close();
-                    System.out.println("logout Error Response: " + errorResponse);
-                }
-                JOptionPane.showMessageDialog(this, "Failed to log out.", "Error", JOptionPane.ERROR_MESSAGE);
+                statusLabel.setText("Failed to log out.");
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println("Exception in logout: " + ex.getMessage());
+            statusLabel.setText("An error occurred: " + ex.getMessage());
+        }
+    }
+
+    private String getResponseString(HttpURLConnection connection) throws Exception {
+        try (InputStream responseStream = connection.getInputStream();
+             Scanner scanner = new Scanner(responseStream, StandardCharsets.UTF_8.name())) {
+            return scanner.useDelimiter("\\A").next();
         }
     }
 
