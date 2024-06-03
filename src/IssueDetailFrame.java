@@ -137,8 +137,23 @@ public class IssueDetailFrame extends JFrame {
         // Sixth Row
         addLabelAndComponent(contentPanel, "Description:", new JScrollPane(descriptionArea), gbc, 0, 6, 4);
 
+        // Add a button to view comments in a new window
+        JButton viewCommentsButton = new JButton("View Comments");
+        viewCommentsButton.setFont(new Font("돋움", Font.PLAIN, 14));
+        viewCommentsButton.setForeground(Color.WHITE);
+        viewCommentsButton.setBackground(new Color(255, 87, 34));
+        viewCommentsButton.setFocusPainted(false);
+        viewCommentsButton.addActionListener(e -> new CommentDetailFrame(issueId).setVisible(true));
+
+        // Add the button to the content panel
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 4;
+        gbc.anchor = GridBagConstraints.CENTER;
+        contentPanel.add(viewCommentsButton, gbc);
+
         // Seventh Row
-        addLabelAndComponent(contentPanel, "Comment:", new JScrollPane(commentArea), gbc, 0, 7, 4);
+        addLabelAndComponent(contentPanel, "Comment:", new JScrollPane(commentArea), gbc, 0, 8, 4);
 
         // Button Row
         JPanel buttonPanel = new JPanel();
@@ -150,12 +165,12 @@ public class IssueDetailFrame extends JFrame {
         buttonPanel.add(createActionButton("Fix Code", e -> fixCode()));
 
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 9;
         gbc.gridwidth = 4;
         gbc.anchor = GridBagConstraints.CENTER;
         contentPanel.add(buttonPanel, gbc);
 
-        gbc.gridy = 9;
+        gbc.gridy = 10;
         contentPanel.add(statusLabel, gbc);
 
         return contentPanel;
@@ -330,7 +345,6 @@ public class IssueDetailFrame extends JFrame {
             if (isResponseSuccessful(connection)) {
                 changeAssignedStatus();
             } else {
-                statusLabel.setText("Failed to change assignee.");
             }
         } catch (Exception ex) {
             statusLabel.setText("An error occurred: " + ex.getMessage());
@@ -348,7 +362,6 @@ public class IssueDetailFrame extends JFrame {
                 statusLabel.setText("Issue status assigned successfully.");
                 loadIssueDetails();  // Refresh the issue details
             } else {
-                statusLabel.setText("Failed to assign issue status.");
             }
         } catch (Exception ex) {
             statusLabel.setText("An error occurred: " + ex.getMessage());
@@ -433,10 +446,10 @@ public class IssueDetailFrame extends JFrame {
                     dispose();
                     new LoginFrame().setVisible(true);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Failed to log out.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Failed to log out1.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Failed to log out.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Failed to log out2.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
